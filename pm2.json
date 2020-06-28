@@ -1,0 +1,12 @@
+{
+  "name": "mlaqr",
+  "script": "build/server.js",
+  "error_file": "var/logs/server.log",
+  "out_file": "var/logs/server.log",
+  "log_date_format": "YYYY-MM-DD HH:mm Z",
+  "env": {
+    "DEV": false,
+    "DEBUG": true,
+    "CONSOLE": true
+  }
+}

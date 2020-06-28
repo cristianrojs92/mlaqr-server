@@ -1,0 +1,80 @@
+/*
+* merchantOrders.ts
+ *
+ * Created on 25 de Junio de 2020
+ * Copyright © 2020
+ * Author Cristian Rojas <b>cristianrojs92@gmail.com</b>
+ *
+ */
+
+import { Request, Response } from "express";
+import * as service from "../services/merchantOrders";
+
+// Utilidades
+import httpRequestError from "../utils/httpRequestError";
+import responseHandler from "../utils/responseHandler";
+
+// Constantes globales
+const { BAD_REQUEST, NOT_FOUND } = responseHandler.statusCodes;
+
+/**
+ * Busca el estado de una orden
+ *
+ * @param req               request
+ * @param res               response
+ *
+ * @return Promise<void>
+ */
+export async function get(req: Request, res: Response): Promise<void> {
+
+  try {
+
+    let query;
+
+    //Verificamos si recibimos el json
+    if(req.query !== undefined){
+      if( typeof req.query == "string"){
+        query = JSON.parse(req.query)
+      } else {
+        query = req.query;
+      }
+      
+    } else {
+      throw new httpRequestError(BAD_REQUEST, `(get): No se recibieron datos`);
+    }
+
+
+      //Buscamos el estado de la orden
+      const results = await service.get(query.external_reference);
+
+      // Verifico el resultado
+      if (results === undefined) {
+
+        // Lanzamos error
+        throw new httpRequestError(NOT_FOUND, "(get): Error al crear una sucursal");
+      }
+
+
+      // Respondemos a la solicitud con status = 200
+      responseHandler.ok(res, results);
+    
+
+
+  } catch (error) {
+
+    console.error(`(get): Se produjo un error al realizar la operación (${error.stack})`);
+
+    // Verificamos el tipo de excepción
+    if (error instanceof httpRequestError) {
+
+      // Respondemos con error
+      responseHandler.customCode(res, error.message, error.status);
+
+    } else {
+
+      // Respondemos con error
+      responseHandler.internalError(res, "(get): Se produjo un error al realizar la operación");
+    }
+  }
+
+}
